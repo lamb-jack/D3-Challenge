@@ -1,4 +1,3 @@
-// @TODO: YOUR CODE HERE!
 let svgWidth = window.innerWidth/2;
 let svgHeight = window.innerHeight/2;
 
@@ -6,7 +5,7 @@ var margin = {
     top: 20,
     right: 40,
     bottom: 80,
-    left: 100
+    left: 60
   };
 
 let width = svgWidth - margin.left - margin.right;
@@ -28,23 +27,23 @@ let chartGroup = svg.append("g")
 d3.csv("assets/data/data.csv").then(function(Data) {
     console.log(Data);
     
-    // Parse Data/Cast as numbers
+    // Parse Data/Cast as numbers // I still don't get this part completely
     Data.forEach(function(data) {
-        data.age = +data.age;
-        data.smokes = +data.smokes;
+        data.healthcare = +data.healthcare;
+        data.poverty = +data.poverty;
     });
     
     // Create scale functions
 
-    // let ageRange = d3.max(Data, d => d.age); // To get an idea of the domain values
-    // console.log(Math.round(ageRange));
+    // let limits = d3.min(Data, d => d.healthcare); // To get an idea of the domain values,
+    // console.log(limits);                          // then I kinda eyeballed it
     
     let xLinearScale = d3.scaleLinear()
-        .domain([27, 49])
+        .domain([8.5, 23])
         .range([0, width]);
 
     let yLinearScale = d3.scaleLinear()
-        .domain([9, 29])
+        .domain([4.5, 27])
         .range([height, 0]);
     
     
@@ -65,23 +64,23 @@ d3.csv("assets/data/data.csv").then(function(Data) {
         .data(Data)
         .enter()
         .append("circle")
-        .attr("cx", d => xLinearScale(d.age))
-        .attr("cy", d => yLinearScale(d.smokes))
-        .attr("r", "15")
+        .attr("cx", d => xLinearScale(d.poverty))
+        .attr("cy", d => yLinearScale(d.healthcare))
+        .attr("r", "10")
         .attr("fill", "lightblue")
         .attr("opacity", ".8");
     
     // Circle Text
-    chartGroup.append("g")
+    let circleText = chartGroup.append("g")
         .selectAll("text")
         .data(Data)
         .enter()
         .append("text")
-        .attr("x", d => xLinearScale(d.age))
-        .attr("y", d => yLinearScale(d.smokes))
+        .attr("x", d => xLinearScale(d.poverty))
+        .attr("y", d => yLinearScale(d.healthcare))
         .attr("text-anchor", "middle")
         .attr("dy", ".35em")
-        .style('font-size', '12px')
+        .style('font-size', '10px')
         .attr('fill', 'white')
         .text(d => d.abbr);  
 
@@ -89,7 +88,7 @@ d3.csv("assets/data/data.csv").then(function(Data) {
     let toolTip = d3.tip()
       .attr("class", "tooltip")
       .offset([80, 80])
-      .html(d => `${d.state}<br>Age: ${d.age} (Median)<br>Smokes: ${d.smokes}%`);
+      .html(d => `${d.state}<br>In Poverty: ${d.poverty}%<br>Lacks H: ${d.healthcare}%`);
 
     // Create tooltip in the chart
     chartGroup.call(toolTip);
@@ -102,20 +101,28 @@ d3.csv("assets/data/data.csv").then(function(Data) {
       .on("mouseout", function(data, index) {
         toolTip.hide(data);
       });
+    // Hovering over circleText was causing trouble so i repeated this
+    circleText.on("mouseover", function(data) {
+      toolTip.show(data, this);
+    })
+      // onmouseout event
+      .on("mouseout", function(data, index) {
+        toolTip.hide(data);
+      });
 
     // Create axes labels
     chartGroup.append("text")
       .attr("transform", "rotate(-90)")
-      .attr("y", 0 - margin.left + 40)
+      .attr("y", 0 - margin.left)
       .attr("x", 0 - (height / 2))
       .attr("dy", "1em")
       .attr("class", "axisText")
-      .text("Smokes (%)");
+      .text("Lacks Healthcare (%)");
 
     chartGroup.append("text")
       .attr("transform", `translate(${width / 2}, ${height + margin.top + 30})`)
       .attr("class", "axisText")
-      .text("Age (Median)");
+      .text("In Poverty (%)");
 
     
 
