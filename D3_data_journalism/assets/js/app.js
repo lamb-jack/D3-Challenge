@@ -1,6 +1,6 @@
 // @TODO: YOUR CODE HERE!
-let svgWidth = window.innerWidth/1.5;
-let svgHeight = window.innerHeight/1.5;
+let svgWidth = window.innerWidth/2;
+let svgHeight = window.innerHeight/2;
 
 var margin = {
     top: 20,
@@ -29,9 +29,9 @@ d3.csv("assets/data/data.csv").then(function(Data) {
     console.log(Data);
     
     // Parse Data/Cast as numbers
-    Data.forEach(d => {
-        Data.age = +d.age;
-        Data.smokes = +d.smokes;
+    Data.forEach(function(data) {
+        data.age = +data.age;
+        data.smokes = +data.smokes;
     });
     
     // Create scale functions
@@ -62,24 +62,34 @@ d3.csv("assets/data/data.csv").then(function(Data) {
 
     // Create Circles
     let circlesGroup = chartGroup.selectAll("circle")
-    .data(Data)
-    .enter()
-    .append("circle")
-    .attr("cx", d => xLinearScale(d.age))
-    .attr("cy", d => yLinearScale(d.smokes))
-    .attr("r", "15")
-    .attr("fill", "lightblue")
-    .attr("opacity", ".8");
-
+        .data(Data)
+        .enter()
+        .append("circle")
+        .attr("cx", d => xLinearScale(d.age))
+        .attr("cy", d => yLinearScale(d.smokes))
+        .attr("r", "15")
+        .attr("fill", "lightblue")
+        .attr("opacity", ".8");
     
+    // Circle Text
+    chartGroup.append("g")
+        .selectAll("text")
+        .data(Data)
+        .enter()
+        .append("text")
+        .attr("x", d => xLinearScale(d.age))
+        .attr("y", d => yLinearScale(d.smokes))
+        .attr("text-anchor", "middle")
+        .attr("dy", ".35em")
+        .style('font-size', '12px')
+        .attr('fill', 'white')
+        .text(d => d.abbr);  
 
     // Initialize tool tip
     let toolTip = d3.tip()
       .attr("class", "tooltip")
-      .offset([80, -60])
-      .html(function(d) {
-        return (`${d.state}<br>Age: ${d.age} (Median)<br>Smokes: ${d.smokes}%`);
-      });
+      .offset([80, 80])
+      .html(d => `${d.state}<br>Age: ${d.age} (Median)<br>Smokes: ${d.smokes}%`);
 
     // Create tooltip in the chart
     chartGroup.call(toolTip);
@@ -107,6 +117,7 @@ d3.csv("assets/data/data.csv").then(function(Data) {
       .attr("class", "axisText")
       .text("Age (Median)");
 
+    
 
 }).catch(function(error) {
     console.log(error);
