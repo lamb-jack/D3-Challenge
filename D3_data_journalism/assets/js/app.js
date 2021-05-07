@@ -46,6 +46,19 @@ d3.csv("assets/data/data.csv").then(function(Data) {
         .domain([4.5, 27])
         .range([height, 0]);
     
+
+    let h = [];
+    let p = [];
+    Data.forEach(d => {
+      let healthy = d.healthcare;
+      let poverty = d.poverty;
+      h.push(healthy);
+      p.push(poverty);
+    })
+    console.log(h);
+    console.log(p);
+      
+
     
     // Create axis functions
     let bottomAxis = d3.axisBottom(xLinearScale);
@@ -114,7 +127,7 @@ d3.csv("assets/data/data.csv").then(function(Data) {
     chartGroup.append("text")
       .attr("transform", "rotate(-90)")
       .attr("y", 0 - margin.left)
-      .attr("x", 0 - (height / 2))
+      .attr("x", 0 - (height / 1.5))
       .attr("dy", "1em")
       .attr("class", "axisText")
       .text("Lacks Healthcare (%)");
